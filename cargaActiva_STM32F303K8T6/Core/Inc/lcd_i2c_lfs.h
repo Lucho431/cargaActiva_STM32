@@ -11,6 +11,12 @@
 
 #include "stm32f3xx_hal.h"
 
+
+#define lcd_send_customChar(X) ( lcd_send_data(X) )
+#define lcd_blinkCursOff ( lcd_send_cmd (0x0C) )
+#define lcd_blinkCursOn  ( lcd_send_cmd (0xD) )
+
+
 #define LCD_DDRAM_ADDRESS	  0x80 // 0b10000000
 #define LCD_START_LINE1 	  0x00
 #define LCD_START_LINE2 	  0x40
@@ -28,5 +34,7 @@ void lcd_send_string (char *str);  // send string to the lcd
 void lcd_put_cur(int row, int col);  // put cursor at the entered position row (0 or 1), col (0-15);
 
 void lcd_clear (void);
+
+void lcd_CustomChar_create(uint8_t, uint8_t[]);
 
 #endif /* LCD_I2C_LFS_H_ */

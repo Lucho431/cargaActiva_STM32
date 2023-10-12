@@ -99,3 +99,14 @@ void lcd_send_string (char *str)
 {
 	while (*str) lcd_send_data (*str++);
 }
+
+void lcd_CustomChar_create(uint8_t location, uint8_t charmap[])
+{
+	location <<= 3;
+
+	lcd_send_cmd (0x40 | (location & 0x38) );
+	for (int i=0; i<8; i++)
+	{
+		lcd_send_data(charmap[i]);
+	}
+}

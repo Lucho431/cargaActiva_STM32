@@ -27,6 +27,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "lcd_i2c_lfs.h"
+#include "INA219.h"
+#include "menu_cargaActiva.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,7 +48,83 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint32_t lecturaEnc;
+int32_t lecturaEnc;
+uint8_t flag_tim7 = 0;
+uint8_t periodo_enc = 0;
+uint8_t periodo_impMed = 0;
+uint8_t lectura_boton = 1;
+uint8_t last_boton = 1;
+INA219_t ina219;
+float corriente;
+uint16_t vshunt;
+uint16_t raw_c;
+uint8_t rango_I = 0;
+float factor_rango = 1.4615384615f;
+uint16_t cal_dinamico [58] = {
+		4059,
+		4028,
+		4018,
+		4009,
+		4010,
+		4009,
+		3999,
+		3993,
+		4002,
+		4002,
+		3998,
+		3996,
+		3993,
+		3988,
+		3981,
+		3980,
+		3977,
+		3976,
+		3971,
+		3971,
+		3967,
+		3962,
+		3958,
+		3957,
+		3951,
+		3946,
+		3937,
+		3933,
+		3929,
+		3923,
+		3917,
+		3912,
+		3906,
+		3902,
+		3893,
+		3884,
+		3877,
+		3871,
+		3865,
+		3846,
+		3842,
+		3842,
+		3843,
+		3836,
+		3830,
+		3825,
+		3820,
+		3812,
+		3806,
+		3798,
+		3790,
+		3781,
+		3773,
+		3766,
+		3758,
+		3746,
+		3735,
+		3801,
+
+};
+
+float c2;
+int16_t c3;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -93,14 +171,79 @@ int main(void)
   MX_TIM1_Init();
   MX_I2C1_Init();
   MX_TIM2_Init();
+  MX_TIM7_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim7); //overflow: 10 ms
+  HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
 
+  lcd_init(&hi2c1, 0x3F);
+
+  INA219_Init(&ina219, &hi2c1, INA219_ADDRESS);
+
+  start_menu ();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  corriente = INA219_ReadCurrent_float(&ina219);
+
+	  c2 = corriente * 1000;
+	  c3 = c2;
+
+	  rango_I = corriente * factor_rango;
+	  //rango_I = corriente * 20;
+
+	  //if (!rango_I) rango_I++;
+
+//	  INA219_setCalibration(&ina219, cal_dinamico[rango_I]);
+
+
+	  switch (rango_I){
+		  case 0:
+			  INA219_setCalibration(&ina219, 4002);
+		  break;
+		  case 1:
+			  INA219_setCalibration(&ina219, 3971);
+		  break;
+		  case 2:
+			  INA219_setCalibration(&ina219, 3937);
+		  break;
+		  case 3:
+			  INA219_setCalibration(&ina219, 3846);
+		  break;
+		  case 4:
+			  INA219_setCalibration(&ina219, 3798);
+		  break;
+		  default:
+
+		  break;
+	  }
+
+	  vshunt = INA219_ReadShuntVolage(&ina219);
+	  raw_c = INA219_ReadCurrent_raw(&ina219);
+
+
+//	  continue;
+	  if (flag_tim7 != 0){
+		  periodo_enc++;
+		  periodo_impMed++;
+		  flag_tim7 = 0;
+	  } //end if flag_tim7
+
+	  if (periodo_enc > 19){
+		  lecturaEnc = __HAL_TIM_GET_COUNTER(&htim7);
+		  __HAL_TIM_SET_COUNTER(&htim7, 0);
+		  periodo_enc = 0;
+
+		  lectura_boton = HAL_GPIO_ReadPin(IN_D4_sw_GPIO_Port, IN_D4_sw_Pin);
+
+	  } //end if periodo_enc
+
+	  check_menu();
+	  last_boton = lectura_boton;
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -157,6 +300,13 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	if (htim->Instance == TIM7){
+		flag_tim7 = 1;
+	}
+} //end HAL_TIM_PeriodElapsedCallback()
+
+
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 {
 	lecturaEnc = __HAL_TIM_GET_COUNTER(htim);

@@ -65,12 +65,8 @@ void Error_Handler(void);
 #define ADC1_2_tension_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_2
 #define VCP_TX_GPIO_Port GPIOA
-#define IN_D3_dt_Pin GPIO_PIN_0
-#define IN_D3_dt_GPIO_Port GPIOB
 #define PWM_D9_Pin GPIO_PIN_8
 #define PWM_D9_GPIO_Port GPIOA
-#define IN_D2_clk_Pin GPIO_PIN_12
-#define IN_D2_clk_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14

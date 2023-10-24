@@ -300,7 +300,14 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
     __HAL_RCC_TIM7_CLK_DISABLE();
 
     /* TIM7 interrupt Deinit */
-    HAL_NVIC_DisableIRQ(TIM7_DAC2_IRQn);
+  /* USER CODE BEGIN TIM7:TIM7_DAC2_IRQn disable */
+    /**
+    * Uncomment the line below to disable the "TIM7_DAC2_IRQn" interrupt
+    * Be aware, disabling shared interrupt may affect other IPs
+    */
+    /* HAL_NVIC_DisableIRQ(TIM7_DAC2_IRQn); */
+  /* USER CODE END TIM7:TIM7_DAC2_IRQn disable */
+
   /* USER CODE BEGIN TIM7_MspDeInit 1 */
 
   /* USER CODE END TIM7_MspDeInit 1 */

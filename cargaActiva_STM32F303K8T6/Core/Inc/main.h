@@ -59,10 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define MCO_Pin GPIO_PIN_0
 #define MCO_GPIO_Port GPIOF
-#define ADC1_1_corriente_Pin GPIO_PIN_0
-#define ADC1_1_corriente_GPIO_Port GPIOA
-#define ADC1_2_tension_Pin GPIO_PIN_1
-#define ADC1_2_tension_GPIO_Port GPIOA
 #define VCP_TX_Pin GPIO_PIN_2
 #define VCP_TX_GPIO_Port GPIOA
 #define PWM_D9_Pin GPIO_PIN_8

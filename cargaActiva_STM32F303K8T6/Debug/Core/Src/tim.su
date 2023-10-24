@@ -5,4 +5,4 @@
 ../Core/Src/tim.c:215:6:HAL_TIM_Encoder_MspInit	48	static
 ../Core/Src/tim.c:252:6:HAL_TIM_MspPostInit	40	static
 ../Core/Src/tim.c:280:6:HAL_TIM_Base_MspDeInit	16	static
-../Core/Src/tim.c:310:6:HAL_TIM_Encoder_MspDeInit	16	static
+../Core/Src/tim.c:317:6:HAL_TIM_Encoder_MspDeInit	16	static

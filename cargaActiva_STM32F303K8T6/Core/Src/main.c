@@ -154,7 +154,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
+  HAL_Delay(100);
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -176,9 +176,16 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim7); //overflow: 10 ms
   HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
 
-  lcd_init(&hi2c1, 0x3F);
+//  for (uint8_t i = 0; i < 128; i++){
+//	  uint32_t i2c_status = HAL_I2C_IsDeviceReady(&hi2c1, (uint16_t)(i<<1), 1, 10);
+//	  if(i2c_status == HAL_OK){
+//		  __NOP();
+//	  }
+//  }
 
-  INA219_Init(&ina219, &hi2c1, INA219_ADDRESS);
+  lcd_init(&hi2c1, 0x27);
+
+ // INA219_Init(&ina219, &hi2c1, INA219_ADDRESS);
 
   start_menu ();
   /* USER CODE END 2 */
@@ -233,8 +240,8 @@ int main(void)
 	  } //end if flag_tim7
 
 	  if (periodo_enc > 19){
-		  lecturaEnc = __HAL_TIM_GET_COUNTER(&htim7);
-		  __HAL_TIM_SET_COUNTER(&htim7, 0);
+		  lecturaEnc = __HAL_TIM_GET_COUNTER(&htim2);
+		  __HAL_TIM_SET_COUNTER(&htim2, 0);
 		  periodo_enc = 0;
 
 		  lectura_boton = HAL_GPIO_ReadPin(IN_D4_sw_GPIO_Port, IN_D4_sw_Pin);
@@ -305,10 +312,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 } //end HAL_TIM_PeriodElapsedCallback()
 
 
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-	lecturaEnc = __HAL_TIM_GET_COUNTER(htim);
-}
+//void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
+//{
+//	lecturaEnc = __HAL_TIM_GET_COUNTER(htim);
+//}
 /* USER CODE END 4 */
 
 /**

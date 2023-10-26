@@ -10,7 +10,7 @@
 #include <lcd_i2c_lfs.h>
 
 I2C_HandleTypeDef* i2c_handler;  // change your handler here accordingly
-uint8_t SLAVE_ADDRESS_LCD; //(0x3F)<<1 // change this according to ur setup
+uint8_t SLAVE_ADDRESS_LCD; //(0x27)<<1 // change this according to ur setup
 
 void lcd_send_cmd (char cmd)
 {

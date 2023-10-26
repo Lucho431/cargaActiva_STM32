@@ -8,6 +8,7 @@
 #include "menu_cargaActiva.h"
 #include "lcd_i2c_lfs.h"
 #include "stdio.h"
+#include "stdlib.h"
 
 
 uint8_t arriba[8] = {
@@ -116,6 +117,8 @@ void init_menuCorriente (void){
 	lcd_send_string("INICIAR");
 	lcd_put_cur(11, 1);
 	lcd_send_string("ATRAS");
+	lcd_put_cur(0, 0);
+	lcd_send_data(0x7E); // ->
 } //fin init_menuCorriente()
 
 
@@ -217,10 +220,12 @@ void acc_menuCorriente (void){
 				} //fin if (PULSO != 0)
 
 				if (lecturaEnc != 0){
-					setPoint_potencia += lecturaEnc;
+					if (abs(lecturaEnc) > 10) lecturaEnc *= 10;
+					setPoint_corriente += (lecturaEnc >> 1);
 					lcd_put_cur(5, 0);
 					sprintf(texto, "%d mA", setPoint_corriente);
 					lcd_send_string(texto);
+					lecturaEnc = 0;
 				} //fin If (lecturaEnc != 0)
 
 				break;
@@ -234,6 +239,7 @@ void acc_menuCorriente (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
 			if (PULSO != 0){
@@ -256,7 +262,7 @@ void acc_menuCorriente (void){
 				lcd_send_string(" ");
 				lcd_put_cur(0, 1);
 				lcd_send_string(" ");
-
+				lecturaEnc = 0;
 			}
 
 			if (lecturaEnc < 0){
@@ -267,11 +273,12 @@ void acc_menuCorriente (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
-			if (PULSO != 0){
-				cursor = 0;
-				pantallaActual = &pantalla [MENU_PRINCIPAL];
+			if (PULSO){
+				//empieza a medir potencia
+				pantallaActual = &pantalla[MEDICION_CORRIENTE];
 				pantallaActual->inicia_menu();
 			}
 		break;
@@ -285,14 +292,14 @@ void acc_menuCorriente (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
-			if (PULSO){
-				//empieza a medir potencia
-				pantallaActual = &pantalla[MEDICION_CORRIENTE];
+			if (PULSO != 0){
+				cursor = 0;
+				pantallaActual = &pantalla [MENU_PRINCIPAL];
 				pantallaActual->inicia_menu();
 			}
-
 		break;
 		default:
 		break;
@@ -317,10 +324,12 @@ void acc_menuPotencia (void){
 				} //fin if (PULSO != 0)
 
 				if (lecturaEnc != 0){
-					setPoint_potencia += lecturaEnc;
+					if (abs(lecturaEnc) > 10) lecturaEnc *= 10;
+					setPoint_potencia += (lecturaEnc >> 1);
 					lcd_put_cur(5, 0);
 					sprintf(texto, "%d mW", setPoint_potencia);
 					lcd_send_string(texto);
+					lecturaEnc = 0;
 				} //fin If (lecturaEnc != 0)
 
 				break;
@@ -334,6 +343,7 @@ void acc_menuPotencia (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
 			if (PULSO != 0){
@@ -356,7 +366,7 @@ void acc_menuPotencia (void){
 				lcd_send_string(" ");
 				lcd_put_cur(0, 1);
 				lcd_send_string(" ");
-
+				lecturaEnc = 0;
 			}
 
 			if (lecturaEnc < 0){
@@ -367,11 +377,12 @@ void acc_menuPotencia (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
-			if (PULSO != 0){
-				cursor = 0;
-				pantallaActual = &pantalla [MENU_PRINCIPAL];
+			if (PULSO){
+				//empieza a medir potencia
+				pantallaActual = &pantalla[MEDICION_POTENCIA];
 				pantallaActual->inicia_menu();
 			}
 		break;
@@ -385,14 +396,14 @@ void acc_menuPotencia (void){
 				lcd_send_string(" ");
 				lcd_put_cur(10, 1);
 				lcd_send_string(" ");
+				lecturaEnc = 0;
 			}
 
-			if (PULSO){
-				//empieza a medir potencia
-				pantallaActual = &pantalla[MEDICION_POTENCIA];
+			if (PULSO != 0){
+				cursor = 0;
+				pantallaActual = &pantalla [MENU_PRINCIPAL];
 				pantallaActual->inicia_menu();
 			}
-
 		break;
 		default:
 		break;
@@ -405,6 +416,7 @@ void acc_medicionCorriente (void){
 		cursor = 0;
 		pantallaActual = &pantalla [MENU_CORRIENTE];
 		pantallaActual->inicia_menu();
+		return;
 	}
 
 	if (periodo_impMed > 29){ //actualiza cada 300 ms
@@ -420,6 +432,7 @@ void acc_medicionPotencia (void){
 		cursor = 0;
 		pantallaActual = &pantalla [MENU_POTENCIA];
 		pantallaActual->inicia_menu();
+		return;
 	}
 
 	if (periodo_impMed > 29){ //actualiza cada 300 ms

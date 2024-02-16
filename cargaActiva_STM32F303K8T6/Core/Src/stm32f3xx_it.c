@@ -55,7 +55,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DAC_HandleTypeDef hdac2;
 extern TIM_HandleTypeDef htim7;
 /* USER CODE BEGIN EV */
 
@@ -208,7 +207,6 @@ void TIM7_DAC2_IRQHandler(void)
 
   /* USER CODE END TIM7_DAC2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim7);
-  HAL_DAC_IRQHandler(&hdac2);
   /* USER CODE BEGIN TIM7_DAC2_IRQn 1 */
 
   /* USER CODE END TIM7_DAC2_IRQn 1 */

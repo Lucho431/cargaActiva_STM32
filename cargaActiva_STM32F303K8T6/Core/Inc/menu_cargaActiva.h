@@ -31,5 +31,4 @@ void start_menu (void);
 void check_menu (void);
 void check_pulsadores (void);
 void check_duracionPulsadores (void);
-
 #endif /* INC_MENU_CARGAACTIVA_H_ */

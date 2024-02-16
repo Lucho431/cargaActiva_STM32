@@ -54,8 +54,11 @@ uint8_t periodo_enc = 0;
 uint8_t periodo_impMed = 0;
 uint8_t lectura_boton = 1;
 uint8_t last_boton = 1;
+uint8_t flag_enableDAC = 0;
 INA219_t ina219;
 float corriente;
+int32_t medida_potencia;
+int32_t medida_corriente;
 uint16_t vshunt;
 uint16_t raw_c;
 uint8_t rango_I = 0;
@@ -125,6 +128,7 @@ uint16_t cal_dinamico [58] = {
 float c2;
 int16_t c3;
 
+uint16_t testDAC = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -171,7 +175,7 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM2_Init();
   MX_TIM7_Init();
-  MX_DAC2_Init();
+  MX_DAC1_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim7); //overflow: 10 ms
   HAL_TIM_Encoder_Start_IT(&htim2, TIM_CHANNEL_ALL);
@@ -185,7 +189,10 @@ int main(void)
 
   lcd_init(&hi2c1, 0x27);
 
- // INA219_Init(&ina219, &hi2c1, INA219_ADDRESS);
+  INA219_Init(&ina219, &hi2c1, INA219_ADDRESS);
+
+  //HAL_DAC_SetValue(&hdac2, DAC_CHANNEL_1, DAC_ALIGN_12B_R, 0); //en 0
+  HAL_DAC_Start(&hdac1, DAC_CHANNEL_1);
 
   start_menu ();
   /* USER CODE END 2 */
@@ -194,6 +201,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+
+//	  HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, testDAC); //la mitad
+
 	  corriente = INA219_ReadCurrent_float(&ina219);
 
 	  c2 = corriente * 1000;
@@ -231,6 +241,7 @@ int main(void)
 	  vshunt = INA219_ReadShuntVolage(&ina219);
 	  raw_c = INA219_ReadCurrent_raw(&ina219);
 
+	  medida_corriente = corriente * 1000;
 
 //	  continue;
 	  if (flag_tim7 != 0){
